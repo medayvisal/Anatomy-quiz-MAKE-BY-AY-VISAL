@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Anatomy Quiz — Ay Visal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1117;color:#e8eaf0;font-family:Georgia,serif;padding:20px}
+.wrap{max-width:680px;margin:0 auto}
+h1{font-size:24px;font-weight:normal;margin-bottom:4px}
+.sub{font-size:12px;color:#4b5563;margin-bottom:28px}
+label{display:block;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#4b5563;margin-bottom:6px}
+select,input[type=number]{background:#1e2230;border:1px solid #2e3347;border-radius:8px;color:#c9cfe0;padding:10px 14px;font-size:14px;width:100%;margin-bottom:16px;outline:none}
+input[type=number]{width:80px}
+.row{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.tog{cursor:pointer;padding:8px 18px;border-radius:6px;font-size:13px;border:1px solid #2e3347;background:transparent;color:#6b7280}
+.tog.on{border-color:#4f6ef7;background:#1a2450;color:#7b9fff}
+.btn-start{width:100%;padding:15px;background:#4f6ef7;color:#fff;border:none;border-radius:10px;font-size:16px;cursor:pointer;margin-top:8px}
+.card{background:#161920;border:1px solid #252836;border-radius:12px;padding:24px 28px;margin-bottom:16px}
+.prog{height:3px;background:#1e2230;border-radius:2px;margin-bottom:20px;overflow:hidden}
+.prog-fill{height:100%;background:#4f6ef7;border-radius:2px;transition:width .3s}
+.qnum{font-size:11px;letter-spacing:.15em;color:#4b5563;margin-bottom:10px}
+.qtext{font-size:17px;line-height:1.6;color:#dde1f0;margin-bottom:24px}
+.choice{display:block;width:100%;text-align:left;padding:12px 16px;margin-bottom:9px;border-radius:8px;border:1px solid #252836;background:#1e2230;color:#b0b8cc;font-size:14px;cursor:pointer;font-family:Georgia,serif;line-height:1.4}
+.choice:hover{border-color:#4f6ef7;color:#a0b4ff}
+.choice.sel{border-color:#4f6ef7;background:#1a2450;color:#a0b4ff}
+.choice.correct{border-color:#22c55e;background:#0d2918;color:#86efac;cursor:default}
+.choice.wrong{border-color:#ef4444;background:#2a0d0d;color:#fca5a5;cursor:default}
+.choice.dim{border-color:#252836;background:#1e2230;color:#4b5563;cursor:default}
+.feedback{margin-top:14px;padding:10px 16px;border-radius:8px;font-size:14px}
+.feedback.ok{background:#0d2918;border:1px solid #22c55e;color:#86efac}
+.feedback.no{background:#2a0d0d;border:1px solid #ef4444;color:#fca5a5}
+.btns{margin-top:18px;display:flex;gap:10px}
+.btn-act{padding:11px 26px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid;font-family:Georgia,serif}
+.btn-act.active{background:#4f6ef7;color:#fff;border-color:#4f6ef7}
+.btn-act.off{background:#1e2230;color:#4b5563;border-color:#2e3347;cursor:default}
+.ring{width:110px;height:110px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;border:8px solid #4f6ef7}
+.ring-num{font-size:30px;font-weight:bold}
+.wrong-item{margin-bottom:16px;padding:14px 18px;background:#1a1520;border:1px solid #2e2030;border-radius:10px}
+.wrong-q{font-size:13px;color:#c9cfe0;margin-bottom:6px;line-height:1.5}
+.wrong-c{font-size:12px;color:#fca5a5;margin-bottom:3px}
+.wrong-a{font-size:12px;color:#86efac}
+.btn-back{padding:11px 28px;background:transparent;color:#6b7280;border:1px solid #2e3347;border-radius:8px;font-size:14px;cursor:pointer;margin-top:20px;font-family:Georgia,serif}
+#menu,#quiz,#results{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="menu">
+    <h1>Anatomy, Physiology & ENT</h1>
+    <div class="sub">បង្កើតដោយ Ay Visal &nbsp;·&nbsp; 125 Questions</div>
+    <div class="card">
+      <label>Topic Section</label>
+      <select id="secSel">
+        <option value="all">All Topics (125 questions)</option>
+        <option value="0">Part 1: Muscular System (Q1–40)</option>
+        <option value="1">Part 2: Skeletal System (Q41–60)</option>
+        <option value="2">Part 3: Bone Development (Q61–75)</option>
+        <option value="3">Part 4: Divisions of Skeleton (Q76–110)</option>
+        <option value="4">Part 5: Lifespan & Review (Q111–120)</option>
+        <option value="5">Part 6: ENT (Q121–125)</option>
+      </select>
+      <label>Number of Questions</label>
+      <div class="row">
+        <input type="number" id="qCount" value="20" min="1" max="125"/>
+        <span style="color:#4b5563;font-size:13px">per session</span>
+      </div>
+      <label>Question Order</label>
+      <div class="row">
+        <button class="tog" id="btnOrder" onclick="setOrder(false)">In order</button>
+        <button class="tog on" id="btnShuf" onclick="setOrder(true)">Shuffled</button>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">Start Quiz →</button>
+    </div>
+  </div>
+
+  <div id="quiz">
+    <h1 id="qTitle">Question 1</h1>
+    <div class="sub" id="qSub"></div>
+    <div class="prog"><div class="prog-fill" id="progFill"></div></div>
+    <div class="card">
+      <div class="qnum" id="qNum"></div>
+      <div class="qtext" id="qText"></div>
+      <div id="choices"></div>
+      <div class="feedback" id="feedback" style="display:none"></div>
+      <div class="btns">
+        <button class="btn-act off" id="btnConfirm" onclick="confirm_()">Confirm</button>
+        <button class="btn-act off" id="btnNext" onclick="next_()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="results">
+    <h1>Results</h1>
+    <div class="sub" style="margin-bottom:20px">Quiz Complete</div>
+    <div class="card" style="text-align:center">
+      <div class="ring" id="ring">
+        <span class="ring-num" id="ringNum"></span>
+        <span style="font-size:12px;color:#6b7280" id="ringFrac"></span>
+      </div>
+      <div style="color:#9ca3af;font-size:15px" id="msg"></div>
+    </div>
+    <div class="card" id="wrongCard" style="display:none">
+      <div style="font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#4b5563;margin-bottom:14px" id="wrongTitle"></div>
+      <div id="wrongList"></div>
+    </div>
+    <button class="btn-back" onclick="showMenu()">← Back to Menu</button>
+  </div>
+</div>
+
+<script>
+const SECS=[[0,39],[40,59],[60,74],[75,109],[110,119],[120,124]];
+let doShuf=true,qs=[],cur=0,sel=null,conf=false,score=0,wrongs=[];
+
+const Q=[
+{"q":"1. Which type of muscle tissue is characterized as being voluntary and controlled by the central nervous system?","c":["A) Smooth muscle","B) Cardiac muscle","C) Skeletal muscle","D) Non-striated muscle","E) Visceral muscle"],"a":"C) Skeletal muscle"},
+{"q":"2. What is the connective tissue layer that surrounds an entire muscle?","c":["A) Endomysium","B) Perimysium","C) Epimysium","D) Sarcolemma","E) Aponeurosis"],"a":"C) Epimysium"},
+{"q":"3. A bundle of muscle fibers is known as a:","c":["A) Myofibril","B) Fascicle","C) Sarcomere","D) Myofilament","E) Triad"],"a":"B) Fascicle"},
+{"q":"4. Which of the following describes an aponeurosis?","c":["A) A cord-like bundle of connective tissue","B) A cell membrane surrounding a muscle fiber","C) A broad, sheet-like muscle attachment","D) The cytoplasm of a muscle cell","E) A contractile unit of a myofibril"],"a":"C) A broad, sheet-like muscle attachment"},
+{"q":"5. The cell membrane of a skeletal muscle fiber is called the:","c":["A) Sarcoplasm","B) Sarcoplasmic reticulum","C) Sarcolemma","D) Perimysium","E) T tubule"],"a":"C) Sarcolemma"},
+{"q":"6. Which structure helps transmit the action potential deep into the muscle cell?","c":["A) Myofibrils","B) Transverse (T) tubules","C) Myofilaments","D) Z lines","E) Actin"],"a":"B) Transverse (T) tubules"},
+{"q":"7. Myofibrils are primarily composed of bundles of:","c":["A) Fascicles","B) Myofilaments","C) Mitochondria","D) Epimysium","E) Sarcolemmas"],"a":"B) Myofilaments"},
+{"q":"8. Which protein is the primary component of thick filaments?","c":["A) Actin","B) Troponin","C) Tropomyosin","D) Myosin","E) Creatine"],"a":"D) Myosin"},
+{"q":"9. The functional unit of a skeletal muscle fiber is the:","c":["A) Sarcolemma","B) Sarcoplasm","C) Sarcomere","D) Myofibril","E) Fascicle"],"a":"C) Sarcomere"},
+{"q":"10. In a sarcomere, the dark bands composed of thick filaments are called:","c":["A) I bands","B) Z lines","C) A bands","D) H bands","E) M lines"],"a":"C) A bands"},
+{"q":"11. Which area of the sarcomere contains only thick filaments and no thin filaments?","c":["A) Zone of overlap","B) H band","C) I band","D) Z line","E) A band"],"a":"B) H band"},
+{"q":"12. What is the function of the sarcoplasmic reticulum (SR) in muscle contraction?","c":["A) To produce ATP","B) To transmit electrical signals","C) To store and release calcium ions","D) To bind to acetylcholine","E) To anchor the muscle to bone"],"a":"C) To store and release calcium ions"},
+{"q":"13. A 'triad' in a muscle fiber consists of:","c":["A) Two actin and one myosin filament","B) One T tubule and two terminal cisternae","C) Three sarcomeres in a row","D) Epimysium, perimysium, and endomysium","E) Myosin, actin, and tropomyosin"],"a":"B) One T tubule and two terminal cisternae"},
+{"q":"14. Muscle contraction is directly caused by the interaction between:","c":["A) The sarcolemma and T tubules","B) Myosin and actin filaments","C) Acetylcholine and cholinesterase","D) ATP and CP","E) Epimysium and perimysium"],"a":"B) Myosin and actin filaments"},
+{"q":"15. The communication link between a neuron and a skeletal muscle fiber occurs at the:","c":["A) Sarcoplasmic reticulum","B) Myofibril","C) Neuromuscular junction","D) Sarcomere","E) Z line"],"a":"C) Neuromuscular junction"},
+{"q":"16. What neurotransmitter is released to initiate skeletal muscle contraction?","c":["A) Dopamine","B) Serotonin","C) Acetylcholine","D) Epinephrine","E) Creatine phosphokinase"],"a":"C) Acetylcholine"},
+{"q":"17. Which of the following is the first step in the contraction cycle?","c":["A) Formation of cross-bridges","B) Pivoting of myosin heads","C) Exposure of active sites","D) Detachment of cross-bridges","E) Reactivation of myosin"],"a":"C) Exposure of active sites"},
+{"q":"18. What causes the myosin head to detach from the actin?","c":["A) The release of calcium","B) Binding of a new ATP molecule","C) The breakdown of acetylcholine","D) The pivoting of the head","E) Exposure of active sites"],"a":"B) Binding of a new ATP molecule"},
+{"q":"19. What is the primary energy source for a resting muscle?","c":["A) Anaerobic glycolysis","B) Aerobic metabolism of fatty acids","C) Creatine phosphate depletion","D) Lactic acid fermentation","E) Acetylcholine breakdown"],"a":"B) Aerobic metabolism of fatty acids"},
+{"q":"20. How many ATP molecules are typically produced per glucose through aerobic metabolism?","c":["A) 2","B) 4","C) 34","D) 100","E) 0"],"a":"C) 34"},
+{"q":"21. Anaerobic glycolysis occurs in the:","c":["A) Mitochondria","B) Sarcoplasmic reticulum","C) Cytoplasm","D) Synaptic cleft","E) T tubules"],"a":"C) Cytoplasm"},
+{"q":"22. What build-up contributes to low pH and muscle fatigue?","c":["A) Oxygen","B) ATP","C) Lactic acid","D) Creatine phosphate","E) Glucose"],"a":"C) Lactic acid"},
+{"q":"23. 'Oxygen debt' refers to:","c":["A) Oxygen needed to stop a contraction","B) Oxygen required to restore normal metabolic conditions after exercise","C) Oxygen trapped in the T tubules","D) A lack of oxygen in the atmosphere","E) Oxygen stored in the SR"],"a":"B) Oxygen required to restore normal metabolic conditions after exercise"},
+{"q":"24. The muscle attachment that remains relatively fixed during contraction is the:","c":["A) Insertion","B) Synergist","C) Origin","D) Antagonist","E) Prime mover"],"a":"C) Origin"},
+{"q":"25. A muscle that opposes a particular movement is known as a(n):","c":["A) Agonist","B) Synergist","C) Antagonist","D) Prime mover","E) Fixator"],"a":"C) Antagonist"},
+{"q":"26. Which muscle is an exception — its name doesn't include 'muscle'?","c":["A) Biceps brachii","B) Diaphragm","C) Deltoid","D) Triceps brachii","E) Rectus femoris"],"a":"B) Diaphragm"},
+{"q":"27. The term 'sarcopenia' refers to:","c":["A) Muscle growth due to exercise","B) The loss of muscle mass due to aging","C) The accumulation of lactic acid","D) The structure of a sarcomere","E) The regeneration of muscle fibers"],"a":"B) The loss of muscle mass due to aging"},
+{"q":"28. By age 80, approximately what percentage of muscle mass is lost?","c":["A) 10%","B) 25%","C) 50%","D) 75%","E) 90%"],"a":"C) 50%"},
+{"q":"29. Which layer of connective tissue surrounds individual muscle cells?","c":["A) Epimysium","B) Perimysium","C) Endomysium","D) Deep fascia","E) Aponeurosis"],"a":"C) Endomysium"},
+{"q":"30. Which enzyme recharges ADP back into ATP using creatine phosphate?","c":["A) Acetylcholinesterase","B) Creatine phosphokinase","C) Amylase","D) Myosin ATPase","E) Lactic acid dehydrogenase"],"a":"B) Creatine phosphokinase"},
+{"q":"31. Which of these is a function of skeletal muscle?","c":["A) Maintain body temperature","B) Pump blood through the body","C) Decrease blood pressure","D) Filter wastes from the blood","E) Produce hormones"],"a":"A) Maintain body temperature"},
+{"q":"32. The area between two Z lines is a:","c":["A) Myofilament","B) Sarcomere","C) Myofibril","D) Sarcoplasm","E) Fascicle"],"a":"B) Sarcomere"},
+{"q":"33. Thin filaments are primarily made of the protein:","c":["A) Myosin","B) Elastin","C) Collagen","D) Actin","E) Keratin"],"a":"D) Actin"},
+{"q":"34. The cytoplasm of a muscle fiber is called:","c":["A) Sarcolemma","B) Sarcoplasm","C) Nucleoplasm","D) Endoplasm","E) Protoplasm"],"a":"B) Sarcoplasm"},
+{"q":"35. The expanded chambers of the SR that contain high calcium concentrations are:","c":["A) T tubules","B) Sarcomeres","C) Terminal cisternae","D) Synaptic vesicles","E) Motor end plates"],"a":"C) Terminal cisternae"},
+{"q":"36. Peak muscular activity primarily relies on which energy source?","c":["A) Aerobic metabolism","B) Anaerobic glycolysis","C) Myoglobin","D) Fatty acid oxidation","E) Vitamin D"],"a":"B) Anaerobic glycolysis"},
+{"q":"37. The 'power stroke' of the myosin head occurs when:","c":["A) ATP binds to the head","B) ADP and phosphate are released","C) Calcium returns to the SR","D) The muscle reaches total fatigue","E) Acetylcholine is neutralized"],"a":"B) ADP and phosphate are released"},
+{"q":"38. Which property of muscle describes its ability to recoil to resting length?","c":["A) Excitability","B) Contractility","C) Extensibility","D) Elasticity","E) Irritability"],"a":"D) Elasticity"},
+{"q":"39. Skeletal muscle is 'striated' because of:","c":["A) The arrangement of fascicles","B) The overlap of epimysium","C) The arrangement of thick and thin filaments","D) The presence of many nuclei","E) The branching nature of the cells"],"a":"C) The arrangement of thick and thin filaments"},
+{"q":"40. When a muscle can no longer perform a required activity, it is said to be:","c":["A) Contracted","B) Excited","C) Fatigued","D) Recovered","E) Extended"],"a":"C) Fatigued"},
+{"q":"41. Which of the following is a function of the skeletal system?","c":["A) Production of heat","B) Communication between neurons","C) Blood cell formation","D) Synthesis of Vitamin C","E) Digestion of lipids"],"a":"C) Blood cell formation"},
+{"q":"42. Bones that are longer than wide with a shaft are classified as:","c":["A) Short bones","B) Flat bones","C) Long bones","D) Irregular bones","E) Sesamoid bones"],"a":"C) Long bones"},
+{"q":"43. Carpals and tarsals are examples of:","c":["A) Long bones","B) Short bones","C) Flat bones","D) Irregular bones","E) Sesamoid bones"],"a":"B) Short bones"},
+{"q":"44. Thin layers of compact bone around spongy bone describe:","c":["A) Long bones","B) Flat bones","C) Short bones","D) Irregular bones","E) Sesamoid bones"],"a":"B) Flat bones"},
+{"q":"45. The vertebrae are classified as:","c":["A) Long bones","B) Short bones","C) Flat bones","D) Irregular bones","E) Sesamoid bones"],"a":"D) Irregular bones"},
+{"q":"46. The shaft of a long bone is called the:","c":["A) Epiphysis","B) Diaphysis","C) Metaphysis","D) Periosteum","E) Endosteum"],"a":"B) Diaphysis"},
+{"q":"47. The ends of a long bone that articulate with other bones are the:","c":["A) Diaphysis","B) Epiphyses","C) Medullary cavities","D) Trabeculae","E) Periosteum"],"a":"B) Epiphyses"},
+{"q":"48. What covers the outer surface of the epiphyses to decrease friction at joints?","c":["A) Periosteum","B) Endosteum","C) Articular (hyaline) cartilage","D) Yellow marrow","E) Compact bone"],"a":"C) Articular (hyaline) cartilage"},
+{"q":"49. The tough fibrous tissue covering the bone (except at articular surfaces) is the:","c":["A) Endosteum","B) Perimysium","C) Periosteum","D) Epimysium","E) Sarcolemma"],"a":"C) Periosteum"},
+{"q":"50. Compact bone is characterized by:","c":["A) Its highly branched trabeculae","B) Being found primarily in the epiphysis","C) Tightly packed tissue with no gaps","D) Containing mostly yellow marrow","E) Being flexible and soft"],"a":"C) Tightly packed tissue with no gaps"},
+{"q":"51. Spongy bone consists of numerous bony plates called:","c":["A) Osteons","B) Canaliculi","C) Trabeculae","D) Lamellae","E) Lacunae"],"a":"C) Trabeculae"},
+{"q":"52. The hollow chamber in the diaphysis of a long bone is the:","c":["A) Epiphyseal plate","B) Medullary cavity","C) Central canal","D) Lacuna","E) Foramen magnum"],"a":"B) Medullary cavity"},
+{"q":"53. Which membrane lines the inside of the medullary cavity?","c":["A) Periosteum","B) Epimysium","C) Endosteum","D) Perichondrium","E) Fascia"],"a":"C) Endosteum"},
+{"q":"54. Mature bone cells found in lacunae are called:","c":["A) Osteoblasts","B) Osteoclasts","C) Osteocytes","D) Chondrocytes","E) Fibroblasts"],"a":"C) Osteocytes"},
+{"q":"55. Large cells that dissolve or break down bone matrix are:","c":["A) Osteocytes","B) Osteoblasts","C) Osteoclasts","D) Osteons","E) Canaliculi"],"a":"C) Osteoclasts"},
+{"q":"56. Bone-forming cells are known as:","c":["A) Osteoclasts","B) Osteoblasts","C) Osteocytes","D) Chondroblasts","E) Leukocytes"],"a":"B) Osteoblasts"},
+{"q":"57. The basic functional unit of compact bone is the:","c":["A) Trabecula","B) Osteon (Haversian system)","C) Canaliculus","D) Lamella","E) Sarcoplasm"],"a":"B) Osteon (Haversian system)"},
+{"q":"58. Tiny canals that transport nutrients between osteocytes are:","c":["A) Central canals","B) Perforating canals","C) Canaliculi","D) Lacunae","E) Fissures"],"a":"C) Canaliculi"},
+{"q":"59. What provides bone with its resilience and strength?","c":["A) Inorganic salts","B) Calcium phosphate","C) Collagen fibers","D) Yellow marrow","E) The medullary cavity"],"a":"C) Collagen fibers"},
+{"q":"60. What makes bone hard and resistant to crushing?","c":["A) Collagen","B) Inorganic salts (calcium phosphate)","C) Osteoclasts","D) Cartilage","E) Water"],"a":"B) Inorganic salts (calcium phosphate)"},
+{"q":"61. Bones that develop from sheet-like layers of connective tissue are called:","c":["A) Endochondral bones","B) Sesamoid bones","C) Intramembranous bones","D) Epiphyseal bones","E) Cartilaginous bones"],"a":"C) Intramembranous bones"},
+{"q":"62. Most bones develop from hyaline cartilage models and are called:","c":["A) Intramembranous bones","B) Endochondral bones","C) Flat bones","D) Sutural bones","E) Fibrous bones"],"a":"B) Endochondral bones"},
+{"q":"63. The region where growth in length occurs during childhood is the:","c":["A) Diaphysis","B) Medullary cavity","C) Epiphyseal plate","D) Articular cartilage","E) Periosteum"],"a":"C) Epiphyseal plate"},
+{"q":"64. Which layer of the epiphyseal plate is closest to the epiphysis?","c":["A) Zone of proliferating cartilage","B) Zone of hypertrophic cartilage","C) Zone of resting cartilage","D) Zone of calcified cartilage","E) Ossified bone"],"a":"C) Zone of resting cartilage"},
+{"q":"65. In which zone of the epiphyseal plate do cells undergo rapid mitosis?","c":["A) Zone of resting cartilage","B) Zone of proliferating cartilage","C) Zone of hypertrophic cartilage","D) Zone of calcified cartilage","E) Medullary cavity"],"a":"B) Zone of proliferating cartilage"},
+{"q":"66. Bone remodeling involves:","c":["A) Only osteoblasts","B) Only osteocytes","C) Both osteoblasts and osteoclasts","D) Only articular cartilage","E) Red marrow turning into yellow marrow"],"a":"C) Both osteoblasts and osteoclasts"},
+{"q":"67. Vitamin D is necessary for the proper absorption of _______ in the small intestine.","c":["A) Protein","B) Vitamin C","C) Calcium","D) Iron","E) Magnesium"],"a":"C) Calcium"},
+{"q":"68. What is the result of Vitamin D deficiency in children?","c":["A) Osteomalacia","B) Scurvy","C) Rickets","D) Sarcopenia","E) Osteoporosis"],"a":"C) Rickets"},
+{"q":"69. Which hormone stimulates division of cartilage cells in epiphyseal plates?","c":["A) Thyroid hormone","B) Sex hormones","C) Pituitary growth hormone","D) Parathyroid hormone","E) Calcitonin"],"a":"C) Pituitary growth hormone"},
+{"q":"70. Physical stress/exercise has what effect on bone?","c":["A) Makes bones thinner and weaker","B) Stimulates bone tissue to thicken and strengthen","C) Prevents calcium absorption","D) Turns red marrow into yellow marrow","E) Has no effect on bone density"],"a":"B) Stimulates bone tissue to thicken and strengthen"},
+{"q":"71. Hematopoiesis is the process of:","c":["A) Bone growth","B) Calcium storage","C) Blood cell formation","D) Nerve transmission","E) Muscle contraction"],"a":"C) Blood cell formation"},
+{"q":"72. Where does blood cell formation primarily occur in an adult?","c":["A) Yellow bone marrow","B) Medullary cavity of the femur","C) Red bone marrow","D) Periosteum","E) Articular cartilage"],"a":"C) Red bone marrow"},
+{"q":"73. Yellow bone marrow is primarily used for:","c":["A) Storing fat (triglycerides)","B) Producing red blood cells","C) Dissolving bone matrix","D) Storing Vitamin C","E) Producing white blood cells"],"a":"A) Storing fat (triglycerides)"},
+{"q":"74. When blood calcium is too high, which hormone stimulates osteoblasts?","c":["A) Growth hormone","B) Parathyroid hormone","C) Calcitonin","D) Estrogen","E) Testosterone"],"a":"C) Calcitonin"},
+{"q":"75. When blood calcium is low, PTH stimulates which cells to break down bone?","c":["A) Osteoblasts","B) Osteocytes","C) Osteoclasts","D) Chondrocytes","E) Fibroblasts"],"a":"C) Osteoclasts"},
+{"q":"76. How many bones are in the average adult human skeleton?","c":["A) 600","B) 126","C) 206","D) 80","E) 300"],"a":"C) 206"},
+{"q":"77. The axial skeleton includes which of the following?","c":["A) Pelvic girdle","B) Upper limbs","C) Skull","D) Pectoral girdle","E) Femur"],"a":"C) Skull"},
+{"q":"78. The appendicular skeleton consists of:","c":["A) Skull and vertebral column","B) Ribs and sternum","C) Limbs and their attachments (girdles)","D) Hyoid bone and sacrum","E) Only the legs"],"a":"C) Limbs and their attachments (girdles)"},
+{"q":"79. The only movable bone in the skull is the:","c":["A) Maxilla","B) Zygomatic bone","C) Mandible","D) Frontal bone","E) Sphenoid bone"],"a":"C) Mandible"},
+{"q":"80. The 'soft spots' in an infant's skull are called:","c":["A) Sutures","B) Sinuses","C) Fontanels","D) Foramina","E) Foveae"],"a":"C) Fontanels"},
+{"q":"81. Which suture separates the frontal bone from the parietal bones?","c":["A) Sagittal suture","B) Lambdoid suture","C) Coronal suture","D) Squamous suture","E) Metopic suture"],"a":"C) Coronal suture"},
+{"q":"82. The large hole at the base of the skull allowing the spinal cord to pass through is the:","c":["A) Foramen ovale","B) Mental foramen","C) Foramen magnum","D) Carotid canal","E) Jugular foramen"],"a":"C) Foramen magnum"},
+{"q":"83. Which bone does not articulate with any other bone?","c":["A) Mandible","B) Hyoid bone","C) Ethmoid bone","D) Atlas","E) Patella"],"a":"B) Hyoid bone"},
+{"q":"84. The first cervical vertebra (C1) that supports the head is the:","c":["A) Axis","B) Atlas","C) Sacrum","D) Coccyx","E) Prominens"],"a":"B) Atlas"},
+{"q":"85. The second cervical vertebra (C2) that allows the head to pivot is the:","c":["A) Atlas","B) Axis","C) Lumbar","D) Thoracic","E) Body"],"a":"B) Axis"},
+{"q":"86. How many lumbar vertebrae are in the human spine?","c":["A) 7","B) 12","C) 5","D) 1","E) 33"],"a":"C) 5"},
+{"q":"87. Which vertebrae articulate with the ribs?","c":["A) Cervical","B) Thoracic","C) Lumbar","D) Sacral","E) Coccygeal"],"a":"B) Thoracic"},
+{"q":"88. The tailbone is scientifically known as the:","c":["A) Sacrum","B) Coccyx","C) Ischium","D) Pubis","E) Ilium"],"a":"B) Coccyx"},
+{"q":"89. True ribs are attached:","c":["A) Only to the vertebrae","B) Directly to the sternum via costal cartilage","C) Only to other ribs","D) To the clavicle","E) Not attached at all"],"a":"B) Directly to the sternum via costal cartilage"},
+{"q":"90. How many pairs of 'floating ribs' do humans have?","c":["A) 7","B) 5","C) 2","D) 12","E) 1"],"a":"C) 2"},
+{"q":"91. The three parts of the sternum are the manubrium, the body, and the:","c":["A) Styloid process","B) Xiphoid process","C) Mastoid process","D) Olecranon process","E) Coronoid process"],"a":"B) Xiphoid process"},
+{"q":"92. The pectoral girdle is composed of the:","c":["A) Humerus and radius","B) Scapula and clavicle","C) Ilium and ischium","D) Sternum and ribs","E) Sacrum and coccyx"],"a":"B) Scapula and clavicle"},
+{"q":"93. The bone of the upper arm is the:","c":["A) Radius","B) Ulna","C) Humerus","D) Fibula","E) Tibia"],"a":"C) Humerus"},
+{"q":"94. On which bone is the olecranon process (elbow) located?","c":["A) Humerus","B) Radius","C) Ulna","D) Femur","E) Clavicle"],"a":"C) Ulna"},
+{"q":"95. In the forearm, the bone on the 'thumb side' is the:","c":["A) Ulna","B) Humerus","C) Radius","D) Scapula","E) Carpal"],"a":"C) Radius"},
+{"q":"96. How many carpal bones are found in one wrist?","c":["A) 5","B) 7","C) 8","D) 14","E) 2"],"a":"C) 8"},
+{"q":"97. The bones that form the palm of the hand are the:","c":["A) Carpals","B) Metacarpals","C) Phalanges","D) Tarsals","E) Metatarsals"],"a":"B) Metacarpals"},
+{"q":"98. The coxal bone is formed by the fusion of the ilium, ischium, and:","c":["A) Sacrum","B) Femur","C) Pubis","D) Coccyx","E) Acetabulum"],"a":"C) Pubis"},
+{"q":"99. The large socket in the hip bone receiving the head of the femur is the:","c":["A) Foramen magnum","B) Glenoid cavity","C) Acetabulum","D) Obturator foramen","E) Sciatic notch"],"a":"C) Acetabulum"},
+{"q":"100. The longest and strongest bone in the body is the:","c":["A) Tibia","B) Humerus","C) Femur","D) Fibula","E) Pelvis"],"a":"C) Femur"},
+{"q":"101. The shin bone is the:","c":["A) Fibula","B) Tibia","C) Ulna","D) Radius","E) Femur"],"a":"B) Tibia"},
+{"q":"102. Which lower leg bone is thin, lateral, and does not bear weight?","c":["A) Tibia","B) Femur","C) Fibula","D) Patella","E) Humerus"],"a":"C) Fibula"},
+{"q":"103. The kneecap is the:","c":["A) Talus","B) Calcaneus","C) Patella","D) Cuboid","E) Scaphoid"],"a":"C) Patella"},
+{"q":"104. The largest tarsal bone forming the heel is the:","c":["A) Talus","B) Navicular","C) Calcaneus","D) Hamate","E) Pisiform"],"a":"C) Calcaneus"},
+{"q":"105. Compared to the male pelvis, the female pelvis is typically:","c":["A) Narrower and heavier","B) Broader and lighter","C) Longer and heart-shaped","D) Smaller in the pubic arch angle","E) More massive with less flared ilia"],"a":"B) Broader and lighter"},
+{"q":"106. The joint between the two pubic bones is the:","c":["A) Sacroiliac joint","B) Symphysis pubis","C) Acetabulum","D) Glenohumeral joint","E) Coronal suture"],"a":"B) Symphysis pubis"},
+{"q":"107. 'Vertebrosternal' ribs is another name for:","c":["A) False ribs","B) Floating ribs","C) True ribs","D) Cervical ribs","E) Pelvic ribs"],"a":"C) True ribs"},
+{"q":"108. The thumb and big toe lack which of the following?","c":["A) Proximal phalanx","B) Distal phalanx","C) Middle phalanx","D) Metacarpal","E) Joint"],"a":"C) Middle phalanx"},
+{"q":"109. Which bone contains the sella turcica, which holds the pituitary gland?","c":["A) Ethmoid bone","B) Sphenoid bone","C) Frontal bone","D) Occipital bone","E) Temporal bone"],"a":"B) Sphenoid bone"},
+{"q":"110. Which of the following is an immovable joint?","c":["A) Knee joint","B) Elbow joint","C) Skull suture","D) Hip joint","E) Wrist joint"],"a":"C) Skull suture"},
+{"q":"111. As a person ages, which of the following occurs in the skeletal system?","c":["A) Height increases","B) Bone matrix becomes more flexible","C) Osteoclasts start to outnumber osteoblasts","D) Calcium levels in the bone rise","E) Spongy bone becomes denser"],"a":"C) Osteoclasts start to outnumber osteoblasts"},
+{"q":"112. Which type of bone loss is especially rapid in menopausal women?","c":["A) Muscle fiber decrease","B) Bone mass loss","C) Lactic acid accumulation","D) Increase in red marrow","E) Sarcopenia"],"a":"B) Bone mass loss"},
+{"q":"113. What is a 'sesamoid' bone?","c":["A) A bone that is very long","B) A bone embedded within a tendon","C) A bone found only in the skull","D) A bone that produces only white blood cells","E) A bone that is soft and flexible"],"a":"B) A bone embedded within a tendon"},
+{"q":"114. The process of the body needing extra oxygen after exercise to restore energy is:","c":["A) Aerobic debt","B) Glycolysis","C) Oxygen debt","D) Sarcopenia","E) Hypertrophy"],"a":"C) Oxygen debt"},
+{"q":"115. Fibrous joints, like sutures, are generally:","c":["A) Freely movable","B) Slightly movable","C) Immovable","D) Filled with synovial fluid","E) Composed of hyaline cartilage"],"a":"C) Immovable"},
+{"q":"116. Synovial joints are characterized by:","c":["A) Being immovable","B) Being held together by a thin layer of cartilage","C) Having a joint cavity filled with fluid","D) Lacking ligaments","E) Being found only in the skull"],"a":"C) Having a joint cavity filled with fluid"},
+{"q":"117. Which property allows muscle to respond to a stimulus?","c":["A) Contractility","B) Elasticity","C) Excitability","D) Extensibility","E) Remodeling"],"a":"C) Excitability"},
+{"q":"118. The 'M-line' in a sarcomere serves to:","c":["A) Anchor thin filaments","B) Anchor thick filaments","C) Release calcium","D) Bind acetylcholine","E) Separate the epiphysis"],"a":"B) Anchor thick filaments"},
+{"q":"119. A motor neuron and all the muscle fibers it controls is called a:","c":["A) Synaptic cleft","B) Motor unit","C) Myofibril","D) Sarcomere","E) Triad"],"a":"B) Motor unit"},
+{"q":"120. Which bone marking is a large, rounded process for muscle attachment on the femur?","c":["A) Tubercle","B) Trochanter","C) Fossa","D) Condyle","E) Foramen"],"a":"B) Trochanter"},
+{"q":"121. Which part of the ear collects sound waves and directs them into the external auditory canal?","c":["A) Cochlea","B) Ossicles","C) Pinna (Auricle)","D) Semicircular canals","E) Eustachian tube"],"a":"C) Pinna (Auricle)"},
+{"q":"122. The external auditory canal is approximately how long?","c":["A) 1.5 cm","B) 2.5 cm","C) 4.0 cm","D) 0.5 cm","E) 5.0 cm"],"a":"B) 2.5 cm"},
+{"q":"123. Which glands in the external ear produce cerumen (earwax)?","c":["A) Adrenal glands","B) Sebaceous and ceruminous glands","C) Thyroid glands","D) Salivary glands","E) Lacrimal glands"],"a":"B) Sebaceous and ceruminous glands"},
+{"q":"124. The tympanic membrane (eardrum) separates which two parts of the ear?","c":["A) The middle ear and the inner ear","B) The external ear and the middle ear","C) The auricle and the auditory canal","D) The cochlea and the vestibule","E) The pharynx and the middle ear"],"a":"B) The external ear and the middle ear"},
+{"q":"125. Which of the following is NOT one of the three auditory ossicles?","c":["A) Malleus","B) Incus","C) Stapes","D) Utricle","E) All of the above are ossicles"],"a":"D) Utricle"}
+];
+
+function shuf(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function setOrder(s){doShuf=s;document.getElementById('btnOrder').className='tog'+(s?'':' on');document.getElementById('btnShuf').className='tog'+(s?' on':'');}
+function show(id){['menu','quiz','results'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none');}
+function showMenu(){show('menu');}
+
+function startQuiz(){
+  const sv=document.getElementById('secSel').value;
+  let pool=sv==='all'?Q:Q.slice(SECS[+sv][0],SECS[+sv][1]+1);
+  let picked=doShuf?shuf(pool):[...pool];
+  const n=Math.min(parseInt(document.getElementById('qCount').value)||20,picked.length);
+  qs=picked.slice(0,n);cur=0;sel=null;conf=false;score=0;wrongs=[];
+  show('quiz');renderQ();
+}
+
+function renderQ(){
+  const q=qs[cur];
+  document.getElementById('qTitle').textContent='Question '+(cur+1)+' of '+qs.length;
+  document.getElementById('qSub').textContent='Score: '+score;
+  document.getElementById('progFill').style.width=(cur/qs.length*100)+'%';
+  document.getElementById('qNum').textContent='Q'+(cur+1)+' / '+qs.length;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('feedback').style.display='none';
+  const bc=document.getElementById('choices');bc.innerHTML='';
+  q.c.forEach(ch=>{
+    const b=document.createElement('button');
+    b.className='choice';b.textContent=ch;
+    b.onclick=()=>pick(ch);bc.appendChild(b);
+  });
+  setBtn('btnConfirm',false);setBtn('btnNext',false);
+}
+
+function pick(ch){
+  if(conf)return;sel=ch;
+  document.querySelectorAll('.choice').forEach(b=>{b.className='choice'+(b.textContent===ch?' sel':'');});
+  setBtn('btnConfirm',true);
+}
+
+function confirm_(){
+  if(!sel||conf)return;conf=true;
+  const q=qs[cur];const ok=sel===q.a;
+  if(ok)score++;else wrongs.push({...q,chosen:sel});
+  document.querySelectorAll('.choice').forEach(b=>{
+    if(b.textContent===q.a)b.className='choice correct';
+    else if(b.textContent===sel&&!ok)b.className='choice wrong';
+    else b.className='choice dim';
+  });
+  const fb=document.getElementById('feedback');
+  fb.className='feedback '+(ok?'ok':'no');
+  fb.textContent=ok?'✓ Correct!':'✗ Correct answer: '+q.a;
+  fb.style.display='block';
+  setBtn('btnConfirm',false);setBtn('btnNext',true);
+  document.getElementById('btnNext').textContent=cur+1>=qs.length?'Finish →':'Next →';
+}
+
+function next_(){
+  if(!conf)return;
+  if(cur+1>=qs.length){showResults();return;}
+  cur++;sel=null;conf=false;renderQ();
+}
+
+function setBtn(id,on){
+  document.getElementById(id).className='btn-act '+(on?'active':'off');
+}
+
+function showResults(){
+  show('results');
+  const pct=Math.round(score/qs.length*100);
+  const ring=document.getElementById('ring');
+  ring.style.borderColor=pct>=70?'#22c55e':pct>=50?'#f59e0b':'#ef4444';
+  document.getElementById('ringNum').style.color=pct>=70?'#86efac':pct>=50?'#fcd34d':'#fca5a5';
+  document.getElementById('ringNum').textContent=pct+'%';
+  document.getElementById('ringFrac').textContent=score+'/'+qs.length;
+  document.getElementById('msg').textContent=pct>=80?'Excellent work!':pct>=60?'Good effort — keep studying!':'Keep reviewing — you\'ll get there!';
+  const wc=document.getElementById('wrongCard');
+  if(wrongs.length>0){
+    wc.style.display='block';
+    document.getElementById('wrongTitle').textContent='Review — '+wrongs.length+' Incorrect';
+    const wl=document.getElementById('wrongList');wl.innerHTML='';
+    wrongs.forEach(w=>{
+      wl.innerHTML+=`<div class="wrong-item"><div class="wrong-q">${w.q}</div><div class="wrong-c">✗ You chose: ${w.chosen}</div><div class="wrong-a">✓ Correct: ${w.a}</div></div>`;
+    });
+  }else{wc.style.display='none';}
+}
+
+show('menu');
+</script>
+
+</body>
+</html>
